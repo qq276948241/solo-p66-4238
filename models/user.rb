@@ -7,6 +7,8 @@ class User < ActiveRecord::Base
   has_many :sell_orders, class_name: 'Order', foreign_key: :seller_id
   has_many :given_reviews, class_name: 'Review', foreign_key: :reviewer_id
   has_many :received_reviews, class_name: 'Review', foreign_key: :reviewee_id
+  has_many :favorites
+  has_many :favorite_textbooks, through: :favorites, source: :textbook
 
   validates :name, presence: true
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }

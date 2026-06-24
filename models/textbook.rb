@@ -1,6 +1,8 @@
 class Textbook < ActiveRecord::Base
   belongs_to :seller, class_name: 'User'
   has_one :order
+  has_many :favorites
+  has_many :favorited_by_users, through: :favorites, source: :user
 
   validates :title, presence: true
   validates :isbn, presence: true
@@ -23,10 +25,19 @@ class Textbook < ActiveRecord::Base
     scope
   end
 
+  def favorited_by?(user)
+    return false unless user
+    favorites.exists?(user_id: user.id)
+  end
+
   def as_json(options = {})
-    super(options.merge(
+    data = super(options.merge(
       methods: [:condition_label],
       include: { seller: { only: [:id, :name, :school_id] } }
     ))
+    if options[:current_user]
+      data['favorited'] = favorited_by?(options[:current_user])
+    end
+    data
   end
 end

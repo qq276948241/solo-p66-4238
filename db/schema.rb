@@ -10,7 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 5) do
+ActiveRecord::Schema[7.2].define(version: 6) do
+  create_table "favorites", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "textbook_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["textbook_id"], name: "index_favorites_on_textbook_id"
+    t.index ["user_id", "textbook_id"], name: "index_favorites_on_user_id_and_textbook_id", unique: true
+  end
+
   create_table "orders", force: :cascade do |t|
     t.integer "textbook_id", null: false
     t.integer "buyer_id", null: false

@@ -42,6 +42,21 @@ class CampusTextbookAPI < Sinatra::Base
     authenticate!
   end
 
+  before '/api/favorites' do
+    authenticate!
+    authorize_verified!
+  end
+
+  before '/api/favorites/*' do
+    authenticate!
+    authorize_verified!
+  end
+
+  before '/api/textbooks/:id/favorite' do
+    authenticate!
+    authorize_verified!
+  end
+
   error ActiveRecord::RecordNotFound do
     status 404
     { error: '资源不存在' }.to_json
