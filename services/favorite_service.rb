@@ -4,13 +4,15 @@ class FavoriteService
   end
 
   def list
-    @user.favorite_textbooks.includes(:seller)
+    @user.favorite_textbooks.includes(:seller).where(status: 'available')
   end
 
   def add(textbook_id)
     textbook = Textbook.find(textbook_id)
+    return [false, nil, textbook, '该教材已下架，无法收藏'] unless textbook.status == 'available'
     favorite = @user.favorites.new(textbook_id: textbook.id)
-    [favorite.save, favorite, textbook]
+    success = favorite.save
+    [success, favorite, textbook, success ? nil : favorite.errors.full_messages.join(', ')]
   end
 
   def remove(textbook_id)

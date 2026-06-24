@@ -6,14 +6,14 @@ class CampusTextbookAPI
 
   post '/api/textbooks/:id/favorite' do
     svc = favorite_service
-    success, favorite, textbook = svc.add(params[:id])
+    success, favorite, textbook, error_msg = svc.add(params[:id])
 
     if success
       status 201
       { message: '收藏成功', favorited: true, textbook: svc.enrich(textbook.as_json, textbook) }.to_json
     else
       status 422
-      { error: favorite.errors.full_messages.join(', ') }.to_json
+      { error: error_msg }.to_json
     end
   end
 

@@ -80,6 +80,7 @@ class CampusTextbookAPI
 
   get '/api/orders/:id/reviews' do
     order = Order.find(params[:id])
+    halt 403, { error: '无权查看此订单评价' }.to_json unless [order.buyer_id, order.seller_id].include?(current_user.id)
     { reviews: order.reviews.includes(:reviewer, :reviewee).as_json }.to_json
   end
 end

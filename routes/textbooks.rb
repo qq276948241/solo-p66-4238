@@ -16,6 +16,9 @@ class CampusTextbookAPI
   get '/api/textbooks/:id' do
     textbook = Textbook.find(params[:id])
     viewer = resolve_viewer
+    unless textbook.status == 'available' || (viewer && textbook.seller_id == viewer.id)
+      raise ActiveRecord::RecordNotFound.new('', 'Textbook')
+    end
 
     data = textbook.as_json
     data = FavoriteService.new(viewer).enrich(data, textbook) if viewer
