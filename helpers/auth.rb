@@ -15,4 +15,13 @@ module AuthHelper
   def current_user
     @current_user
   end
+
+  def resolve_viewer
+    token = request.env['HTTP_AUTHORIZATION']&.sub(/^Bearer\s+/i, '')
+    token ? User.find_by(api_token: token) : nil
+  end
+
+  def favorite_service(user = @current_user)
+    FavoriteService.new(user)
+  end
 end

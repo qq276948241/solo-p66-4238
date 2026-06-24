@@ -1,25 +1,25 @@
 class CampusTextbookAPI
-  helpers AuthHelper
-
-  def current_user_opt
-    token = request.env['HTTP_AUTHORIZATION']&.sub(/^Bearer\s+/i, '')
-    token ? User.find_by(api_token: token) : nil
-  end
-
   get '/api/textbooks' do
     textbooks = Textbook.filter(
       course_name: params[:course_name],
       min_price: params[:min_price],
       max_price: params[:max_price]
     ).includes(:seller)
-    viewer = current_user_opt
-    { textbooks: textbooks.map { |t| t.as_json(current_user: viewer) } }.to_json
+
+    viewer = resolve_viewer
+    svc = FavoriteService.new(viewer) if viewer
+
+    result = viewer ? svc.enrich_collection(textbooks) : textbooks.as_json
+    { textbooks: result }.to_json
   end
 
   get '/api/textbooks/:id' do
     textbook = Textbook.find(params[:id])
-    viewer = current_user_opt
-    textbook.as_json(current_user: viewer).to_json
+    viewer = resolve_viewer
+
+    data = textbook.as_json
+    data = FavoriteService.new(viewer).enrich(data, textbook) if viewer
+    data.to_json
   end
 
   post '/api/textbooks' do

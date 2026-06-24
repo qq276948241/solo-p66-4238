@@ -31,13 +31,9 @@ class Textbook < ActiveRecord::Base
   end
 
   def as_json(options = {})
-    data = super(options.merge(
+    super(options.merge(
       methods: [:condition_label],
       include: { seller: { only: [:id, :name, :school_id] } }
     ))
-    if options[:current_user]
-      data['favorited'] = favorited_by?(options[:current_user])
-    end
-    data
   end
 end

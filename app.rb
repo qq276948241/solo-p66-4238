@@ -11,12 +11,15 @@ set :show_exceptions, false
 
 Dir[File.join(File.dirname(__FILE__), 'models', '*.rb')].each { |f| require f }
 Dir[File.join(File.dirname(__FILE__), 'helpers', '*.rb')].each { |f| require f }
+Dir[File.join(File.dirname(__FILE__), 'services', '*.rb')].each { |f| require f }
 
 class CampusTextbookAPI < Sinatra::Base
   register Sinatra::ActiveRecordExtension
 
   set :database, { adapter: 'sqlite3', database: 'db/campus_textbook.db' }
   set :show_exceptions, false
+
+  helpers AuthHelper
 
   before do
     content_type :json
@@ -42,17 +45,7 @@ class CampusTextbookAPI < Sinatra::Base
     authenticate!
   end
 
-  before '/api/favorites' do
-    authenticate!
-    authorize_verified!
-  end
-
-  before '/api/favorites/*' do
-    authenticate!
-    authorize_verified!
-  end
-
-  before '/api/textbooks/:id/favorite' do
+  before %r{/api/(favorites|textbooks/\d+/favorite)} do
     authenticate!
     authorize_verified!
   end
